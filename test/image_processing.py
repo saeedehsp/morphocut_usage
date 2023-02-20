@@ -12,8 +12,8 @@ from morphocut.image import (
 )
 import numpy as np
 import os
-train_dir = './Crustacea/train'
-test_dir = './Crustacea/val'
+train_dir = '../Crustacea/train'
+test_dir = '../Crustacea/val'
 
 class_names0 = os.listdir(train_dir)
 if ".DS_Store" in class_names0:
