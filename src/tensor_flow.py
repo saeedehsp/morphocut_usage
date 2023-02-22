@@ -3,6 +3,7 @@ import tensorflow as tf
 from morphocut import Node, Output, RawOrVariable, ReturnOutputs, closing_if_closable
 from morphocut.batch import Batch
 from morphocut.utils import buffered_generator
+from torchvision.transforms.functional import to_tensor
 
 
 @ReturnOutputs
@@ -56,7 +57,7 @@ class TensorFlow(Node):
                     if isinstance(input, Batch):
                         input = tf.stack(input)
                     elif not self.is_batch:
-                        input = tf.expand_dims(input, 0)
+                        input = to_tensor(input).unsqueeze(0)
 
                     if self.model.variables:
                         # Enable evaluation mode

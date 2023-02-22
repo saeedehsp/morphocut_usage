@@ -2,7 +2,7 @@ from contextlib import nullcontext
 from random import sample
 from morphocut.batch import BatchPipeline
 from morphocut.core import Pipeline
-from morphocut.image import ImageWriter, RescaleIntensity
+from morphocut.image import ImageWriter, RescaleIntensity, ImageReader
 from src.tensor_flow import TensorFlow
 from PIL import Image
 import PIL
@@ -49,11 +49,9 @@ class MyModule(tf.Module):
 
 def t_tensor_flow(device, n_parallel, batch, output_key):
     module = MyModule(output_key)
-    image_path = sample(image_file_list,1)
-    input_pil = PIL.Image.open(image_path[0])
-    input_np = np.array(input_pil)
-    input_im = NumpyToTensor(input_np)
+    image_path = sample(image_file_list,1)[0]
     with Pipeline() as p:
+        input_im = ImageReader(image_path)
         block = BatchPipeline(2) if batch else nullcontext(p)
         with block:
             result = TensorFlow(
@@ -67,7 +65,7 @@ def t_tensor_flow(device, n_parallel, batch, output_key):
             result = RescaleIntensity(result, dtype=np.uint8)
     p.run()
 
-    new_path = image_path[0].replace("train", "DL/TensorFlow")
+    new_path = image_path.replace("train", "DL/TensorFlow")
     os.makedirs(os.path.dirname(new_path), exist_ok=True)
     results = [o[result] for o in p.transform_stream()]
     with Pipeline() as pipeline:
